@@ -1,0 +1,13 @@
+{
+    "background": {
+        "scripts": ["background.js"]
+    },
+
+    "manifest_version": 3,
+
+    "name": "ask-your-bookmarks",
+
+    "permissions": ["bookmarks"],
+
+    "version": "1"
+}
