@@ -1,23 +1,35 @@
+import { isValidUrl, cleanFolder } from "./preprocessing.js";
+import { EXCLUDE_FOLDERS, NONE_FOLDERS } from "./config.js";
 
-//Recursively walks the bookmarks tree
-function traverse(nodes, folderPath = []) {
+
+
+function traverse(nodes, parentFolder = null) {
   let results = [];
 
   for (const node of nodes) {
     if (node.url) {
       if (isValidUrl(node.url)) {
+        // skip if parent is excluded
+        if (EXCLUDE_FOLDERS.includes(parentFolder)) {
+          continue;
+        }
+
+        let folderTag = "none";
+        if (parentFolder && !NONE_FOLDERS.includes(parentFolder)) {
+          folderTag = parentFolder; // user-created folder
+        }
+
         results.push({
-          title: node.title,
+          title: node.title || "(untitled)",
           url: node.url,
-          folder: cleanFolder(folderPath.join("/"))
+          folder: folderTag
         });
       }
     } else if (node.children) {
-      results = results.concat(
-        traverse(node.children, [...folderPath, node.title])
-      );
+      results = results.concat(traverse(node.children, node.title));
     }
   }
+
   return results;
 }
 
@@ -31,5 +43,6 @@ export async function getAllBookmarks() {
     return bookmarks;
   } catch (err) {
     console.error("Error fetching bookmarks:", err);
+    return [];
   }
 }

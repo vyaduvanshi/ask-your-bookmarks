@@ -1,7 +1,7 @@
 import { getAllBookmarks } from "./bookmarks/fetch.js";
 
 // Call once background starts
-getAllBookmarks();
+// getAllBookmarks();
 
 
 
