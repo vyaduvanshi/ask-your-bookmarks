@@ -4,6 +4,10 @@
         "type": "module"
     },
 
+    "action": {
+        "default_popup": "popup.html"
+    },
+
     "manifest_version": 3,
 
     "name": "Ask Your Bookmarks",

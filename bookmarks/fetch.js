@@ -1,4 +1,4 @@
-import { isValidUrl, cleanFolder } from "./preprocessing.js";
+import { isValidUrl } from "./preprocessing.js";
 import { EXCLUDE_FOLDERS, NONE_FOLDERS } from "./config.js";
 
 
