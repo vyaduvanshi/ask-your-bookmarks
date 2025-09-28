@@ -1,0 +1,1 @@
+// Adds new bookmark's embedding to db whenever user bookmarks a new page

@@ -1,3 +1,7 @@
+console.log("popup.js is running");
+
+
+
 // Import Transformers.js from CDN
 import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js';
 
@@ -17,7 +21,7 @@ let bookmarkEmbeddings = [];
 async function loadEmbedder() {
   embedder = await pipeline(
     "feature-extraction",
-    "sentence-transformers/all-MiniLM-L6-v2"
+    "Xenova/all-MiniLM-L6-v2"
   );
   console.log("Model loaded!");
 }
@@ -28,7 +32,7 @@ async function computeBookmarkEmbeddings() {
 
   bookmarkEmbeddings = [];
   for (let b of bookmarks) {
-    const emb = await embedder(b.title);
+    const emb = await embedder(b.title, {pooling: "mean", normalize: true});
     bookmarkEmbeddings.push({ title: b.title, embedding: emb[0] });
   }
   console.log("Bookmark embeddings ready!");
@@ -36,10 +40,17 @@ async function computeBookmarkEmbeddings() {
 
 // Cosine similarity helper
 function cosineSim(a, b) {
-  const dot = a.reduce((sum, v, i) => sum + v * b[i], 0);
-  const normA = Math.sqrt(a.reduce((sum, v) => sum + v * v, 0));
-  const normB = Math.sqrt(b.reduce((sum, v) => sum + v * v, 0));
-  return dot / (normA * normB);
+  console.log('a')
+  console.log(a.dims)
+  console.log('b')
+  console.log(b.dims)
+  const dataA = a.data;
+  const dataB = b.data;
+  let dot = 0;
+  for (let i = 0; i < dataA.length; i++) {
+    dot += dataA[i] * dataB[i];
+  }
+  return dot; // since vectors are normalized, dot product == cosine similarity
 }
 
 // Search function
@@ -47,7 +58,7 @@ async function searchBookmarks(query) {
   if (!embedder) await loadEmbedder();
   if (bookmarkEmbeddings.length === 0) await computeBookmarkEmbeddings();
 
-  const queryEmb = (await embedder(query))[0];
+  const queryEmb = (await embedder(query, {pooling: "mean", normalize: true}))[0];
 
   const results = bookmarkEmbeddings.map(b => ({
     title: b.title,
