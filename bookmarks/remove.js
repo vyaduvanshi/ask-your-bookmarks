@@ -1,1 +1,0 @@
-// Removes a bookmark from the db whenever user deletes a bookmark

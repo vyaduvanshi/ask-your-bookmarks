@@ -3,7 +3,7 @@ import { EXCLUDE_FOLDERS, NONE_FOLDERS } from "./config.js";
 
 
 
-function traverse(nodes, parentFolder = null) {
+export function traverse(nodes, parentFolder = null) {
   let results = [];
 
   for (const node of nodes) {
@@ -20,12 +20,14 @@ function traverse(nodes, parentFolder = null) {
         }
 
         results.push({
+          id: node.id,
           title: node.title || "(untitled)",
           url: node.url,
           folder: folderTag
         });
       }
-    } else if (node.children) {
+    }
+    else if (node.children) {
       results = results.concat(traverse(node.children, node.title));
     }
   }
@@ -38,11 +40,42 @@ export async function getAllBookmarks() {
     let tree = await browser.bookmarks.getTree();
     // Flatten tree into simple JSON
     const bookmarks = traverse(tree);
-    console.log("Processed Bookmarks:", bookmarks);
-    console.log("Unprocessed Bookmarks:", tree);
+    console.log("Processed Bookmarks:", bookmarks.length);
     return bookmarks;
   } catch (err) {
     console.error("Error fetching bookmarks:", err);
+    return [];
+  }
+}
+
+
+// ---- First-time setup handler ----
+export async function initializeBookmarks() {
+  try {
+    const { dbInitialized } = await browser.storage.local.get("dbInitialized");
+
+    if (!dbInitialized) {
+      console.log("First run: fetching all bookmarks...");
+      const bookmarks = await getAllBookmarks();
+
+      // embed each bookmark (placeholder for now)
+      const withEmbeddings = [];
+      for (const bm of bookmarks) {
+        const emb = await createEmbedding(bm);
+        withEmbeddings.push(emb);
+      }
+
+      // store flag that initialization is done
+      await browser.storage.local.set({ dbInitialized: true });
+
+      console.log("Initialization complete. Total:", withEmbeddings.length);
+      return withEmbeddings;
+    } else {
+      console.log("Bookmarks already initialized. Skipping fetch.");
+      return [];
+    }
+  } catch (err) {
+    console.error("Error in initialization:", err);
     return [];
   }
 }

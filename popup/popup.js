@@ -2,8 +2,7 @@ console.log("popup.js is running");
 
 
 
-// Import Transformers.js from CDN
-import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers/dist/transformers.min.js';
+
 
 // Example bookmarks JSON (just titles for now)
 const bookmarks = [
@@ -17,14 +16,7 @@ const bookmarks = [
 let embedder;
 let bookmarkEmbeddings = [];
 
-// Load the embedding model
-async function loadEmbedder() {
-  embedder = await pipeline(
-    "feature-extraction",
-    "Xenova/all-MiniLM-L6-v2"
-  );
-  console.log("Model loaded!");
-}
+
 
 // Precompute embeddings for bookmark titles
 async function computeBookmarkEmbeddings() {
@@ -38,20 +30,7 @@ async function computeBookmarkEmbeddings() {
   console.log("Bookmark embeddings ready!");
 }
 
-// Cosine similarity helper
-function cosineSim(a, b) {
-  console.log('a')
-  console.log(a.dims)
-  console.log('b')
-  console.log(b.dims)
-  const dataA = a.data;
-  const dataB = b.data;
-  let dot = 0;
-  for (let i = 0; i < dataA.length; i++) {
-    dot += dataA[i] * dataB[i];
-  }
-  return dot; // since vectors are normalized, dot product == cosine similarity
-}
+
 
 // Search function
 async function searchBookmarks(query) {
